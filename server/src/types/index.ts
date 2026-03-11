@@ -23,7 +23,7 @@ export interface IUser extends Document {
     postcode?: string;
     country?: string;
   };
-  skills: { name: string; proficiency: string; availability: string }[];
+  skills: { name: string; proficiency: string; availability: string; rate: string }[];
   interests: { name: string; description: string; level: string; willingToPay: string }[];
   rating: number;
   reviewCount: number;

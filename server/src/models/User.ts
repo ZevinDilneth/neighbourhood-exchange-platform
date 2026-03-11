@@ -23,6 +23,7 @@ const userSchema = new Schema<IUser>(
       name:         { type: String, trim: true, required: true },
       proficiency:  { type: String, enum: ['Beginner', 'Intermediate', 'Advanced', 'Expert'], default: 'Intermediate' },
       availability: { type: String, trim: true, default: 'Flexible' },
+      rate:         { type: String, trim: true, default: '' },
     }],
     interests: [{
       name:         { type: String, trim: true, required: true },

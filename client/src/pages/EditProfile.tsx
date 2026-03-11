@@ -27,6 +27,7 @@ interface SkillEntry {
   name: string;
   proficiency: string;
   availability: string;
+  rate: string;
 }
 
 interface InterestEntry {
@@ -117,6 +118,15 @@ const SkillCard: React.FC<{
         </Box>
       )}
     </Box>
+
+    {/* CEU Rate */}
+    <TextField
+      size="small" fullWidth label="CEU Rate" placeholder="e.g. 25/hr or Free"
+      value={skill.rate || ''}
+      onChange={(e) => onChange({ ...skill, rate: e.target.value })}
+      sx={{ mb: '0.625rem', '& .MuiOutlinedInput-root': { borderRadius: '0.5rem', fontSize: '0.8125rem' } }}
+      InputLabelProps={{ sx: { fontSize: '0.8125rem' } }}
+    />
 
     {/* Proficiency + Availability */}
     <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.625rem' }}>
@@ -216,41 +226,45 @@ const InterestCard: React.FC<{
   onChange: (updated: InterestEntry) => void;
   onRemove: () => void;
 }> = ({ entry, onChange, onRemove }) => (
-  <Box sx={{ background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '0.75rem', overflow: 'hidden', mb: '0.875rem', transition: 'box-shadow 0.2s', '&:hover': { boxShadow: '0 2px 8px rgba(16,185,129,0.1)' } }}>
-    {/* Header bar */}
-    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: '1.25rem', py: '0.875rem', borderBottom: '1px solid #F3F4F6' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, minWidth: 0 }}>
-        <i className="fas fa-lightbulb" style={{ color: '#10B981', fontSize: '0.875rem', flexShrink: 0 }} />
-        <Typography sx={{ fontWeight: 700, fontSize: '0.9375rem', color: '#1F2937', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entry.name}</Typography>
-        <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', px: '0.5rem', py: '0.15rem', background: 'rgba(16,185,129,0.1)', color: '#10B981', border: '1px solid rgba(16,185,129,0.2)', fontSize: '0.65rem', fontWeight: 600, borderRadius: '999px', flexShrink: 0, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
-          Wanted
-        </Box>
+  <Box sx={{ background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: '0.625rem', p: '1rem', position: 'relative', mb: '0.875rem', '&:hover': { borderColor: '#C7D2FE' } }}>
+    {/* Remove button */}
+    <IconButton size="small" onClick={onRemove}
+      sx={{ position: 'absolute', top: '0.5rem', right: '0.5rem', color: '#9CA3AF', '&:hover': { color: '#EF4444', background: '#FEF2F2' } }}>
+      <i className="fas fa-times" style={{ fontSize: '0.75rem' }} />
+    </IconButton>
+
+    {/* Name + badge */}
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem', mb: '0.875rem', pr: '1.75rem' }}>
+      <Typography sx={{ fontWeight: 600, fontSize: '0.9375rem', color: '#1F2937', flex: 1 }}>{entry.name}</Typography>
+      <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', px: '0.5rem', py: '0.2rem', background: GRAD, color: '#fff', fontSize: '0.6875rem', fontWeight: 500, borderRadius: '0.375rem', flexShrink: 0 }}>
+        <i className="fas fa-lightbulb" style={{ fontSize: '0.6rem' }} /> Wanted
       </Box>
-      <IconButton size="small" onClick={onRemove} sx={{ color: '#EF4444', opacity: 0.6, '&:hover': { opacity: 1, bgcolor: '#FEF2F2' }, ml: '0.5rem' }}>
-        <i className="fas fa-times" style={{ fontSize: '0.75rem' }} />
-      </IconButton>
     </Box>
-    {/* Fields */}
-    <Box sx={{ px: '1.25rem', py: '0.875rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-      <TextField fullWidth size="small" label="What do you want to learn?" placeholder="e.g. Basic chords and strumming patterns"
-        value={entry.description}
-        onChange={(e) => onChange({ ...entry, description: e.target.value })}
-        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '0.5rem', '&.Mui-focused fieldset': { borderColor: '#10B981' } } }}
+
+    {/* Description */}
+    <TextField fullWidth size="small" label="What do you want to learn?" placeholder="e.g. Basic chords and strumming patterns"
+      value={entry.description}
+      onChange={(e) => onChange({ ...entry, description: e.target.value })}
+      sx={{ mb: '0.625rem', '& .MuiOutlinedInput-root': { borderRadius: '0.5rem', fontSize: '0.8125rem' } }}
+      InputLabelProps={{ sx: { fontSize: '0.8125rem' } }}
+    />
+
+    {/* Level + Willing to pay */}
+    <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.625rem' }}>
+      <FormControl size="small" fullWidth>
+        <InputLabel sx={{ fontSize: '0.8125rem' }}>Your Level</InputLabel>
+        <Select label="Your Level" value={entry.level || 'Beginner'}
+          onChange={(e) => onChange({ ...entry, level: e.target.value })}
+          sx={{ borderRadius: '0.5rem', fontSize: '0.8125rem' }}>
+          {INTEREST_LEVELS.map((l) => <MenuItem key={l} value={l} sx={{ fontSize: '0.8125rem' }}>{l}</MenuItem>)}
+        </Select>
+      </FormControl>
+      <TextField size="small" fullWidth label="Willing to pay" placeholder="e.g. 20/hr or Free swap"
+        value={entry.willingToPay}
+        onChange={(e) => onChange({ ...entry, willingToPay: e.target.value })}
+        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '0.5rem', fontSize: '0.8125rem' } }}
+        InputLabelProps={{ sx: { fontSize: '0.8125rem' } }}
       />
-      <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-        <FormControl size="small" fullWidth>
-          <InputLabel>Your Level</InputLabel>
-          <Select label="Your Level" value={entry.level} onChange={(e) => onChange({ ...entry, level: e.target.value })}
-            sx={{ borderRadius: '0.5rem', '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#10B981' } }}>
-            {INTEREST_LEVELS.map((l) => <MenuItem key={l} value={l}>{l}</MenuItem>)}
-          </Select>
-        </FormControl>
-        <TextField size="small" fullWidth label="Willing to pay" placeholder="e.g. 20/hr or Free swap"
-          value={entry.willingToPay}
-          onChange={(e) => onChange({ ...entry, willingToPay: e.target.value })}
-          sx={{ '& .MuiOutlinedInput-root': { borderRadius: '0.5rem', '&.Mui-focused fieldset': { borderColor: '#10B981' } } }}
-        />
-      </Box>
     </Box>
   </Box>
 );
@@ -354,8 +368,8 @@ const EditProfile: React.FC = () => {
     const rawSkills = (user.skills ?? []) as unknown[];
     setSkills(rawSkills.map((s) =>
       typeof s === 'string'
-        ? { name: s as string, proficiency: 'Intermediate', availability: 'Flexible' }
-        : s as SkillEntry
+        ? { name: s as string, proficiency: 'Intermediate', availability: 'Flexible', rate: '' }
+        : (s as SkillEntry).rate !== undefined ? (s as SkillEntry) : { ...(s as SkillEntry), rate: '' }
     ));
     // Handle legacy string[] interests or new object[] interests
     const rawInterests = (user.interests ?? []) as unknown[];
@@ -436,7 +450,7 @@ const EditProfile: React.FC = () => {
   // Skill helpers
   const addSkill = (name: string) => {
     if (skills.find((s) => s.name.toLowerCase() === name.toLowerCase())) return;
-    setSkills((prev) => [...prev, { name, proficiency: 'Intermediate', availability: 'Flexible' }]);
+    setSkills((prev) => [...prev, { name, proficiency: 'Intermediate', availability: 'Flexible', rate: '' }]);
   };
 
   const removeSkill = (index: number) => setSkills((prev) => prev.filter((_, i) => i !== index));

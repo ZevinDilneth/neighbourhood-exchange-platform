@@ -340,7 +340,7 @@ const Register: React.FC = () => {
       const { confirmPassword: _c, ...data } = form;
       await register(data as RegisterData);
       // Send new users straight to edit profile to complete their profile
-      navigate('/edit-profile');
+      navigate('/profile/edit');
     } catch (err: unknown) {
       const respData = (err as { response?: { data?: { message?: string; errors?: string[] } } })?.response?.data;
       // Prefer the first specific Joi error, then the message field, then a fallback

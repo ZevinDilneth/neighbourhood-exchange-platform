@@ -151,7 +151,7 @@ const VideoIntroModal: React.FC<{
   onClose: () => void;
   userName: string;
   userSkills: { name: string }[];
-  userInterests: string[];
+  userInterests: { name: string }[];
   onSaved: (url: string) => void;
 }> = ({ open, onClose, userName, userSkills, userInterests, onSaved }) => {
   const PHASES = buildPhases(userName, userSkills, userInterests);
@@ -803,14 +803,22 @@ const MyProfile: React.FC = () => {
         ) : (
           <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
             {profile.skills.map((skill) => (
-              <Box key={skill.name} sx={{ background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: '0.5rem', p: '1.25rem', transition: 'all 0.2s', '&:hover': { borderColor: '#4F46E5', transform: 'translateY(-2px)', boxShadow: '0 1px 3px rgba(0,0,0,0.12)' } }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: '0.75rem' }}>
+              <Box key={skill.name} sx={{ background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '0.5rem', p: '1.25rem', transition: 'all 0.2s', '&:hover': { borderColor: '#4F46E5', transform: 'translateY(-2px)', boxShadow: '0 1px 3px rgba(0,0,0,0.12)' } }}>
+                {/* Header */}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: '1rem' }}>
                   <Typography sx={{ fontSize: '1rem', fontWeight: 600, color: '#1F2937' }}>{skill.name}</Typography>
-                  <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', px: '0.5rem', py: '0.25rem', background: 'linear-gradient(135deg, #4F46E5, #10B981)', color: '#fff', fontSize: '0.75rem', fontWeight: 500, borderRadius: '0.375rem', flexShrink: 0 }}>
-                    <i className="fas fa-chalkboard-teacher" /> Skill
+                  <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', px: '0.5rem', py: '0.25rem', background: 'linear-gradient(135deg, #4F46E5, #10B981)', color: '#fff', fontSize: '0.75rem', fontWeight: 500, borderRadius: '0.375rem', flexShrink: 0, ml: '0.5rem' }}>
+                    <i className="fas fa-chalkboard-teacher" style={{ fontSize: '0.65rem' }} /> Skill
                   </Box>
                 </Box>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                {/* Details */}
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  {skill.rate && (
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
+                      <Typography component="span" sx={{ color: '#6B7280', fontSize: '0.875rem' }}>CEU Rate:</Typography>
+                      <Typography component="span" sx={{ color: '#4F46E5', fontWeight: 600, fontSize: '0.875rem' }}>{skill.rate}</Typography>
+                    </Box>
+                  )}
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
                     <Typography component="span" sx={{ color: '#6B7280', fontSize: '0.875rem' }}>Proficiency:</Typography>
                     <Typography component="span" sx={{ color: '#1F2937', fontWeight: 500, fontSize: '0.875rem' }}>{skill.proficiency || 'Intermediate'}</Typography>
@@ -841,32 +849,32 @@ const MyProfile: React.FC = () => {
         ) : (
           <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
             {profile.interests.map((interest, idx) => (
-              <Box key={idx} sx={{ background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '0.75rem', overflow: 'hidden', transition: 'all 0.2s', '&:hover': { borderColor: '#10B981', transform: 'translateY(-2px)', boxShadow: '0 4px 12px rgba(16,185,129,0.12)' } }}>
-                {/* Card header */}
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: '1rem 1.25rem 0.75rem' }}>
-                  <Typography sx={{ fontSize: '1rem', fontWeight: 700, color: '#1F2937' }}>{interest.name}</Typography>
-                  <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', px: '0.6rem', py: '0.25rem', background: 'rgba(16,185,129,0.1)', color: '#10B981', border: '1px solid rgba(16,185,129,0.2)', fontSize: '0.7rem', fontWeight: 600, borderRadius: '999px', flexShrink: 0, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+              <Box key={idx} sx={{ background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '0.5rem', p: '1.25rem', transition: 'all 0.2s', '&:hover': { borderColor: '#4F46E5', transform: 'translateY(-2px)', boxShadow: '0 1px 3px rgba(0,0,0,0.12)' } }}>
+                {/* Header */}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: '1rem' }}>
+                  <Typography sx={{ fontSize: '1rem', fontWeight: 600, color: '#1F2937' }}>{interest.name}</Typography>
+                  <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', px: '0.5rem', py: '0.25rem', background: 'linear-gradient(135deg, #4F46E5, #10B981)', color: '#fff', fontSize: '0.75rem', fontWeight: 500, borderRadius: '0.375rem', flexShrink: 0, ml: '0.5rem' }}>
                     <i className="fas fa-lightbulb" style={{ fontSize: '0.65rem' }} /> Wanted
                   </Box>
                 </Box>
                 {/* Description */}
                 {interest.description && (
-                  <Typography sx={{ px: '1.25rem', pb: '0.75rem', fontSize: '0.85rem', color: '#6B7280', lineHeight: 1.5 }}>
+                  <Typography sx={{ mb: '0.75rem', fontSize: '0.875rem', color: '#6B7280', lineHeight: 1.5 }}>
                     {interest.description}
                   </Typography>
                 )}
-                {/* Details row */}
-                <Box sx={{ display: 'flex', gap: '1rem', px: '1.25rem', pb: '1rem', pt: interest.description ? 0 : '0.25rem', borderTop: '1px solid #F3F4F6', mt: '0.25rem', pt: '0.75rem' }}>
+                {/* Details */}
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   {interest.willingToPay && (
-                    <Box>
-                      <Typography sx={{ fontSize: '0.7rem', color: '#9CA3AF', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.04em', mb: '0.15rem' }}>Willing to pay</Typography>
-                      <Typography sx={{ fontSize: '0.85rem', fontWeight: 700, color: '#4F46E5' }}>{interest.willingToPay}</Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
+                      <Typography component="span" sx={{ color: '#6B7280', fontSize: '0.875rem' }}>Willing to pay:</Typography>
+                      <Typography component="span" sx={{ color: '#4F46E5', fontWeight: 600, fontSize: '0.875rem' }}>{interest.willingToPay}</Typography>
                     </Box>
                   )}
                   {interest.level && (
-                    <Box>
-                      <Typography sx={{ fontSize: '0.7rem', color: '#9CA3AF', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.04em', mb: '0.15rem' }}>Level</Typography>
-                      <Typography sx={{ fontSize: '0.85rem', fontWeight: 600, color: '#1F2937' }}>{interest.level}</Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
+                      <Typography component="span" sx={{ color: '#6B7280', fontSize: '0.875rem' }}>Level:</Typography>
+                      <Typography component="span" sx={{ color: '#1F2937', fontWeight: 500, fontSize: '0.875rem' }}>{interest.level}</Typography>
                     </Box>
                   )}
                 </Box>
