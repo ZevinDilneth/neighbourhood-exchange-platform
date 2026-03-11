@@ -68,7 +68,7 @@ const ResetPassword: React.FC = () => {
       setSuccess(true);
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
-      setError(msg || 'Password reset failed — check your connection and try again.');
+      setError(msg || 'Password reset failed - check your connection and try again.');
     } finally {
       setLoading(false);
     }
@@ -244,7 +244,7 @@ const ResetPassword: React.FC = () => {
                     disabled={loading}
                     sx={{ mb: 2, py: 1.25 }}
                   >
-                    {loading ? 'Savingâ€¦' : 'Set new password'}
+                    {loading ? 'Saving...' : 'Set new password'}
                   </Button>
 
                   <Box sx={{ textAlign: 'center' }}>
