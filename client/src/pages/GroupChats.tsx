@@ -50,7 +50,7 @@ const GroupChats: React.FC = () => {
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState<{ userId: string; name?: string } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const { data: group } = useQuery({
