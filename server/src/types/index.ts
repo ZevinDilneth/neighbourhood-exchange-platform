@@ -23,8 +23,9 @@ export interface IUser extends Document {
     postcode?: string;
     country?: string;
   };
-  skills: { name: string; proficiency: string; availability: string; rate: string }[];
-  interests: { name: string; description: string; level: string; willingToPay: string }[];
+  skills: { name: string; type: string; description: string; proficiency: string; availability: string; rate: string }[];
+  interests: { name: string; category: string; description: string; level: string; willingToPay: string }[];
+  ceuBalance: number;
   rating: number;
   reviewCount: number;
   exchangeCount: number;

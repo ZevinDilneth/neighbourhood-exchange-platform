@@ -25,6 +25,8 @@ const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string;
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface SkillEntry {
   name: string;
+  type: string;
+  description: string;
   proficiency: string;
   availability: string;
   rate: string;
@@ -32,6 +34,7 @@ interface SkillEntry {
 
 interface InterestEntry {
   name: string;
+  category: string;
   description: string;
   level: string;
   willingToPay: string;
@@ -41,6 +44,8 @@ interface InterestEntry {
 const PROFICIENCY_LEVELS = ['Beginner', 'Intermediate', 'Advanced', 'Expert'];
 const AVAILABILITY_OPTIONS = ['Flexible', 'Weekdays', 'Weekends', 'Evenings', 'Mornings', 'Anytime', 'By Appointment'];
 const INTEREST_LEVELS = ['Beginner', 'Intermediate', 'Advanced'];
+const SKILL_TYPES = ['Teaching', 'Exchange', 'Both', 'Other'];
+const INTEREST_CATEGORIES = ['Music', 'Gardening', 'Cooking', 'Art', 'Technology', 'Fitness', 'Languages', 'Photography', 'Crafts', 'Sports', 'Other'];
 
 const SKILL_SUGGESTIONS = [
   'Cooking', 'Gardening', 'Photography', 'Coding', 'Music', 'Yoga',
@@ -109,21 +114,33 @@ const SkillCard: React.FC<{
       <i className="fas fa-times" style={{ fontSize: '0.75rem' }} />
     </IconButton>
 
-    {/* Name row */}
+    {/* Name + type badge row */}
     <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem', mb: '0.875rem', pr: '1.75rem' }}>
       <Typography sx={{ fontWeight: 600, fontSize: '0.9375rem', color: '#1F2937', flex: 1 }}>{skill.name}</Typography>
-      {badge && (
-        <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', px: '0.5rem', py: '0.2rem', background: badge.bg, color: badge.color, border: `1px solid ${badge.color}30`, fontSize: '0.6875rem', fontWeight: 600, borderRadius: '0.375rem', flexShrink: 0 }}>
-          {badge.label}
-        </Box>
-      )}
     </Box>
 
-    {/* CEU Rate */}
-    <TextField
-      size="small" fullWidth label="CEU Rate" placeholder="e.g. 25/hr or Free"
-      value={skill.rate || ''}
-      onChange={(e) => onChange({ ...skill, rate: e.target.value })}
+    {/* Type + CEU Rate */}
+    <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.625rem', mb: '0.625rem' }}>
+      <FormControl size="small" fullWidth>
+        <InputLabel sx={{ fontSize: '0.8125rem' }}>Type</InputLabel>
+        <Select label="Type" value={skill.type || 'Teaching'}
+          onChange={(e) => onChange({ ...skill, type: e.target.value })}
+          sx={{ borderRadius: '0.5rem', fontSize: '0.8125rem' }}>
+          {SKILL_TYPES.map((t) => <MenuItem key={t} value={t} sx={{ fontSize: '0.8125rem' }}>{t}</MenuItem>)}
+        </Select>
+      </FormControl>
+      <TextField size="small" fullWidth label="CEU Rate" placeholder="e.g. 25/hr"
+        value={skill.rate || ''}
+        onChange={(e) => onChange({ ...skill, rate: e.target.value })}
+        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '0.5rem', fontSize: '0.8125rem' } }}
+        InputLabelProps={{ sx: { fontSize: '0.8125rem' } }}
+      />
+    </Box>
+
+    {/* Description */}
+    <TextField size="small" fullWidth label="Description" placeholder="e.g. Learn portrait composition and lighting techniques"
+      value={skill.description || ''}
+      onChange={(e) => onChange({ ...skill, description: e.target.value })}
       sx={{ mb: '0.625rem', '& .MuiOutlinedInput-root': { borderRadius: '0.5rem', fontSize: '0.8125rem' } }}
       InputLabelProps={{ sx: { fontSize: '0.8125rem' } }}
     />
@@ -132,29 +149,18 @@ const SkillCard: React.FC<{
     <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.625rem' }}>
       <FormControl size="small" fullWidth>
         <InputLabel sx={{ fontSize: '0.8125rem' }}>Proficiency</InputLabel>
-        <Select
-          label="Proficiency"
-          value={skill.proficiency || 'Intermediate'}
+        <Select label="Proficiency" value={skill.proficiency || 'Intermediate'}
           onChange={(e) => onChange({ ...skill, proficiency: e.target.value })}
-          sx={{ borderRadius: '0.5rem', fontSize: '0.8125rem' }}
-        >
-          {PROFICIENCY_LEVELS.map((l) => (
-            <MenuItem key={l} value={l} sx={{ fontSize: '0.8125rem' }}>{l}</MenuItem>
-          ))}
+          sx={{ borderRadius: '0.5rem', fontSize: '0.8125rem' }}>
+          {PROFICIENCY_LEVELS.map((l) => <MenuItem key={l} value={l} sx={{ fontSize: '0.8125rem' }}>{l}</MenuItem>)}
         </Select>
       </FormControl>
-
       <FormControl size="small" fullWidth>
         <InputLabel sx={{ fontSize: '0.8125rem' }}>Availability</InputLabel>
-        <Select
-          label="Availability"
-          value={skill.availability || 'Flexible'}
+        <Select label="Availability" value={skill.availability || 'Flexible'}
           onChange={(e) => onChange({ ...skill, availability: e.target.value })}
-          sx={{ borderRadius: '0.5rem', fontSize: '0.8125rem' }}
-        >
-          {AVAILABILITY_OPTIONS.map((a) => (
-            <MenuItem key={a} value={a} sx={{ fontSize: '0.8125rem' }}>{a}</MenuItem>
-          ))}
+          sx={{ borderRadius: '0.5rem', fontSize: '0.8125rem' }}>
+          {AVAILABILITY_OPTIONS.map((a) => <MenuItem key={a} value={a} sx={{ fontSize: '0.8125rem' }}>{a}</MenuItem>)}
         </Select>
       </FormControl>
     </Box>
@@ -233,12 +239,27 @@ const InterestCard: React.FC<{
       <i className="fas fa-times" style={{ fontSize: '0.75rem' }} />
     </IconButton>
 
-    {/* Name + badge */}
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem', mb: '0.875rem', pr: '1.75rem' }}>
-      <Typography sx={{ fontWeight: 600, fontSize: '0.9375rem', color: '#1F2937', flex: 1 }}>{entry.name}</Typography>
-      <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', px: '0.5rem', py: '0.2rem', background: GRAD, color: '#fff', fontSize: '0.6875rem', fontWeight: 500, borderRadius: '0.375rem', flexShrink: 0 }}>
-        <i className="fas fa-lightbulb" style={{ fontSize: '0.6rem' }} /> Wanted
-      </Box>
+    {/* Name row */}
+    <Box sx={{ mb: '0.875rem', pr: '1.75rem' }}>
+      <Typography sx={{ fontWeight: 600, fontSize: '0.9375rem', color: '#1F2937' }}>{entry.name}</Typography>
+    </Box>
+
+    {/* Category + Willing to pay */}
+    <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.625rem', mb: '0.625rem' }}>
+      <FormControl size="small" fullWidth>
+        <InputLabel sx={{ fontSize: '0.8125rem' }}>Category</InputLabel>
+        <Select label="Category" value={entry.category || 'Other'}
+          onChange={(e) => onChange({ ...entry, category: e.target.value })}
+          sx={{ borderRadius: '0.5rem', fontSize: '0.8125rem' }}>
+          {INTEREST_CATEGORIES.map((c) => <MenuItem key={c} value={c} sx={{ fontSize: '0.8125rem' }}>{c}</MenuItem>)}
+        </Select>
+      </FormControl>
+      <TextField size="small" fullWidth label="Willing to pay" placeholder="e.g. 20/hr"
+        value={entry.willingToPay}
+        onChange={(e) => onChange({ ...entry, willingToPay: e.target.value })}
+        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '0.5rem', fontSize: '0.8125rem' } }}
+        InputLabelProps={{ sx: { fontSize: '0.8125rem' } }}
+      />
     </Box>
 
     {/* Description */}
@@ -249,23 +270,15 @@ const InterestCard: React.FC<{
       InputLabelProps={{ sx: { fontSize: '0.8125rem' } }}
     />
 
-    {/* Level + Willing to pay */}
-    <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.625rem' }}>
-      <FormControl size="small" fullWidth>
-        <InputLabel sx={{ fontSize: '0.8125rem' }}>Your Level</InputLabel>
-        <Select label="Your Level" value={entry.level || 'Beginner'}
-          onChange={(e) => onChange({ ...entry, level: e.target.value })}
-          sx={{ borderRadius: '0.5rem', fontSize: '0.8125rem' }}>
-          {INTEREST_LEVELS.map((l) => <MenuItem key={l} value={l} sx={{ fontSize: '0.8125rem' }}>{l}</MenuItem>)}
-        </Select>
-      </FormControl>
-      <TextField size="small" fullWidth label="Willing to pay" placeholder="e.g. 20/hr or Free swap"
-        value={entry.willingToPay}
-        onChange={(e) => onChange({ ...entry, willingToPay: e.target.value })}
-        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '0.5rem', fontSize: '0.8125rem' } }}
-        InputLabelProps={{ sx: { fontSize: '0.8125rem' } }}
-      />
-    </Box>
+    {/* Level */}
+    <FormControl size="small" fullWidth>
+      <InputLabel sx={{ fontSize: '0.8125rem' }}>Your Level</InputLabel>
+      <Select label="Your Level" value={entry.level || 'Beginner'}
+        onChange={(e) => onChange({ ...entry, level: e.target.value })}
+        sx={{ borderRadius: '0.5rem', fontSize: '0.8125rem' }}>
+        {INTEREST_LEVELS.map((l) => <MenuItem key={l} value={l} sx={{ fontSize: '0.8125rem' }}>{l}</MenuItem>)}
+      </Select>
+    </FormControl>
   </Box>
 );
 
@@ -366,18 +379,18 @@ const EditProfile: React.FC = () => {
     setBio(user.bio ?? '');
     // Handle legacy string[] skills or new object[] skills
     const rawSkills = (user.skills ?? []) as unknown[];
-    setSkills(rawSkills.map((s) =>
-      typeof s === 'string'
-        ? { name: s as string, proficiency: 'Intermediate', availability: 'Flexible', rate: '' }
-        : (s as SkillEntry).rate !== undefined ? (s as SkillEntry) : { ...(s as SkillEntry), rate: '' }
-    ));
+    setSkills(rawSkills.map((s): SkillEntry => {
+      if (typeof s === 'string') return { name: s, type: 'Teaching', description: '', proficiency: 'Intermediate', availability: 'Flexible', rate: '' };
+      const e = s as Partial<SkillEntry> & { name: string };
+      return { type: 'Teaching', description: '', rate: '', proficiency: 'Intermediate', availability: 'Flexible', ...e };
+    }));
     // Handle legacy string[] interests or new object[] interests
     const rawInterests = (user.interests ?? []) as unknown[];
-    setInterests(rawInterests.map((i) =>
-      typeof i === 'string'
-        ? { name: i as string, description: '', level: 'Beginner', willingToPay: '' }
-        : i as InterestEntry
-    ));
+    setInterests(rawInterests.map((i): InterestEntry => {
+      if (typeof i === 'string') return { name: i, category: 'Other', description: '', level: 'Beginner', willingToPay: '' };
+      const e = i as Partial<InterestEntry> & { name: string };
+      return { category: 'Other', description: '', level: 'Beginner', willingToPay: '', ...e };
+    }));
     setLocation({
       address:       user.location?.address       ?? '',
       neighbourhood: user.location?.neighbourhood ?? '',
@@ -450,7 +463,7 @@ const EditProfile: React.FC = () => {
   // Skill helpers
   const addSkill = (name: string) => {
     if (skills.find((s) => s.name.toLowerCase() === name.toLowerCase())) return;
-    setSkills((prev) => [...prev, { name, proficiency: 'Intermediate', availability: 'Flexible', rate: '' }]);
+    setSkills((prev) => [...prev, { name, type: 'Teaching', description: '', proficiency: 'Intermediate', availability: 'Flexible', rate: '' }]);
   };
 
   const removeSkill = (index: number) => setSkills((prev) => prev.filter((_, i) => i !== index));
@@ -650,7 +663,7 @@ const EditProfile: React.FC = () => {
 
           <AddInterestInput
             existing={interests.map((e) => e.name.toLowerCase())}
-            onAdd={(name) => setInterests((prev) => [...prev, { name, description: '', level: 'Beginner', willingToPay: '' }])}
+            onAdd={(name) => setInterests((prev) => [...prev, { name, category: 'Other', description: '', level: 'Beginner', willingToPay: '' }])}
           />
 
           {interests.length === 0 && (
