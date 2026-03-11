@@ -68,8 +68,9 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 
 // Health check (both paths for Railway + generic monitors)
+let dbReady = false;
 const healthHandler = (_req: express.Request, res: express.Response) =>
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({ status: 'ok', db: dbReady, timestamp: new Date().toISOString() });
 app.get('/health', healthHandler);
 app.get('/api/health', healthHandler);
 
@@ -89,17 +90,22 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-const start = async () => {
-  await connectDB();
+// Start listening FIRST so Railway healthcheck passes, then connect to DB/Redis
+httpServer.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT} (${process.env.NODE_ENV || 'development'})`);
+});
+
+(async () => {
+  try {
+    await connectDB();
+    dbReady = true;
+  } catch (err) {
+    console.error('❌ MongoDB connection failed:', err);
+    // Don't exit — let Railway see the process is alive; it will retry on next deploy
+  }
   try {
     await connectRedis();
   } catch (err) {
     console.warn('⚠️  Redis not available, continuing without cache');
   }
-
-  httpServer.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT} (${process.env.NODE_ENV || 'development'})`);
-  });
-};
-
-start();
+})();
