@@ -339,8 +339,8 @@ const Register: React.FC = () => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { confirmPassword: _c, ...data } = form;
       await register(data as RegisterData);
-      // Navigate to verify-email and pass email for the "check your inbox" message
-      navigate('/verify-email', { state: { email: form.email } });
+      // Send new users straight to edit profile to complete their profile
+      navigate('/edit-profile');
     } catch (err: unknown) {
       const respData = (err as { response?: { data?: { message?: string; errors?: string[] } } })?.response?.data;
       // Prefer the first specific Joi error, then the message field, then a fallback
