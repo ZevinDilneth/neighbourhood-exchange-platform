@@ -15,7 +15,7 @@ export interface User {
     country?: string;
   };
   skills: { name: string; proficiency: string; availability: string }[];
-  interests: string[];
+  interests: { name: string; description: string; level: string; willingToPay: string }[];
   rating: number;
   reviewCount: number;
   exchangeCount: number;

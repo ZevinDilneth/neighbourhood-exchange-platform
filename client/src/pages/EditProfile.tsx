@@ -29,9 +29,17 @@ interface SkillEntry {
   availability: string;
 }
 
+interface InterestEntry {
+  name: string;
+  description: string;
+  level: string;
+  willingToPay: string;
+}
+
 // ─── Constants ───────────────────────────────────────────────────────────────
 const PROFICIENCY_LEVELS = ['Beginner', 'Intermediate', 'Advanced', 'Expert'];
 const AVAILABILITY_OPTIONS = ['Flexible', 'Weekdays', 'Weekends', 'Evenings', 'Mornings', 'Anytime', 'By Appointment'];
+const INTEREST_LEVELS = ['Beginner', 'Intermediate', 'Advanced'];
 
 const SKILL_SUGGESTIONS = [
   'Cooking', 'Gardening', 'Photography', 'Coding', 'Music', 'Yoga',
@@ -202,64 +210,95 @@ const AddSkillInput: React.FC<{
 };
 
 // ─── Interest tag input ───────────────────────────────────────────────────────
-const InterestInput: React.FC<{
-  tags: string[];
-  onChange: (tags: string[]) => void;
-}> = ({ tags, onChange }) => {
+// ─── Interest card (editable) ────────────────────────────────────────────────
+const InterestCard: React.FC<{
+  entry: InterestEntry;
+  onChange: (updated: InterestEntry) => void;
+  onRemove: () => void;
+}> = ({ entry, onChange, onRemove }) => (
+  <Box sx={{ background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '0.75rem', overflow: 'hidden', mb: '0.875rem', transition: 'box-shadow 0.2s', '&:hover': { boxShadow: '0 2px 8px rgba(16,185,129,0.1)' } }}>
+    {/* Header bar */}
+    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: '1.25rem', py: '0.875rem', borderBottom: '1px solid #F3F4F6' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, minWidth: 0 }}>
+        <i className="fas fa-lightbulb" style={{ color: '#10B981', fontSize: '0.875rem', flexShrink: 0 }} />
+        <Typography sx={{ fontWeight: 700, fontSize: '0.9375rem', color: '#1F2937', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entry.name}</Typography>
+        <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', px: '0.5rem', py: '0.15rem', background: 'rgba(16,185,129,0.1)', color: '#10B981', border: '1px solid rgba(16,185,129,0.2)', fontSize: '0.65rem', fontWeight: 600, borderRadius: '999px', flexShrink: 0, textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+          Wanted
+        </Box>
+      </Box>
+      <IconButton size="small" onClick={onRemove} sx={{ color: '#EF4444', opacity: 0.6, '&:hover': { opacity: 1, bgcolor: '#FEF2F2' }, ml: '0.5rem' }}>
+        <i className="fas fa-times" style={{ fontSize: '0.75rem' }} />
+      </IconButton>
+    </Box>
+    {/* Fields */}
+    <Box sx={{ px: '1.25rem', py: '0.875rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+      <TextField fullWidth size="small" label="What do you want to learn?" placeholder="e.g. Basic chords and strumming patterns"
+        value={entry.description}
+        onChange={(e) => onChange({ ...entry, description: e.target.value })}
+        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '0.5rem', '&.Mui-focused fieldset': { borderColor: '#10B981' } } }}
+      />
+      <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+        <FormControl size="small" fullWidth>
+          <InputLabel>Your Level</InputLabel>
+          <Select label="Your Level" value={entry.level} onChange={(e) => onChange({ ...entry, level: e.target.value })}
+            sx={{ borderRadius: '0.5rem', '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#10B981' } }}>
+            {INTEREST_LEVELS.map((l) => <MenuItem key={l} value={l}>{l}</MenuItem>)}
+          </Select>
+        </FormControl>
+        <TextField size="small" fullWidth label="Willing to pay" placeholder="e.g. 20/hr or Free swap"
+          value={entry.willingToPay}
+          onChange={(e) => onChange({ ...entry, willingToPay: e.target.value })}
+          sx={{ '& .MuiOutlinedInput-root': { borderRadius: '0.5rem', '&.Mui-focused fieldset': { borderColor: '#10B981' } } }}
+        />
+      </Box>
+    </Box>
+  </Box>
+);
+
+// ─── Add interest input ───────────────────────────────────────────────────────
+const AddInterestInput: React.FC<{
+  existing: string[];
+  onAdd: (name: string) => void;
+}> = ({ existing, onAdd }) => {
   const [input, setInput] = useState('');
 
-  const addTag = (val: string) => {
+  const submit = (val: string) => {
     const t = val.trim();
-    if (!t || tags.includes(t)) return;
-    onChange([...tags, t]);
+    if (!t || existing.includes(t.toLowerCase())) return;
+    onAdd(t);
     setInput('');
   };
 
-  const removeTag = (tag: string) => onChange(tags.filter((t) => t !== tag));
-
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addTag(input); }
-    else if (e.key === 'Backspace' && !input && tags.length) removeTag(tags[tags.length - 1]);
+    if (e.key === 'Enter') { e.preventDefault(); submit(input); }
   };
 
-  const unused = LEARN_SUGGESTIONS.filter((s) => !tags.includes(s)).slice(0, 8);
+  const unused = LEARN_SUGGESTIONS.filter((s) => !existing.includes(s.toLowerCase())).slice(0, 8);
 
   return (
     <Box>
-      {tags.length > 0 && (
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem', mb: '0.875rem' }}>
-          {tags.map((tag) => (
-            <Chip key={tag} label={tag} size="small" onDelete={() => removeTag(tag)}
-              sx={{ bgcolor: '#D1FAE5', color: '#065F46', fontWeight: 600, fontSize: '0.8125rem',
-                    '& .MuiChip-deleteIcon': { color: '#10B981', opacity: 0.7, '&:hover': { opacity: 1 } } }} />
-          ))}
-        </Box>
-      )}
-      <TextField
-        fullWidth size="small"
-        placeholder="e.g. Guitar, Knitting, Pottery…"
+      <TextField fullWidth size="small" placeholder="e.g. Guitar, Knitting, Pottery…"
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
-        onBlur={() => { if (input.trim()) addTag(input); }}
         InputProps={{
+          startAdornment: <InputAdornment position="start"><i className="fas fa-lightbulb" style={{ color: '#10B981', fontSize: '0.8rem' }} /></InputAdornment>,
           endAdornment: input.trim() ? (
             <InputAdornment position="end">
-              <IconButton size="small" onClick={() => addTag(input)}>
+              <IconButton size="small" onClick={() => submit(input)}>
                 <i className="fas fa-plus" style={{ fontSize: '0.75rem', color: '#10B981' }} />
               </IconButton>
             </InputAdornment>
           ) : undefined,
         }}
-        helperText="Press Enter or comma to add"
-        sx={{ mb: unused.length ? '0.75rem' : 0, '& .MuiOutlinedInput-root': { borderRadius: '0.5rem',
-          '&.Mui-focused fieldset': { borderColor: '#10B981' } } }}
+        helperText="Press Enter to add — then fill in details below"
+        sx={{ mb: unused.length ? '0.75rem' : 0, '& .MuiOutlinedInput-root': { borderRadius: '0.5rem', '&.Mui-focused fieldset': { borderColor: '#10B981' } } }}
       />
       {unused.length > 0 && (
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem', alignItems: 'center' }}>
           <Typography sx={{ fontSize: '0.6875rem', color: '#9CA3AF', mr: '0.25rem' }}>Quick add:</Typography>
           {unused.map((s) => (
-            <Chip key={s} label={s} size="small" variant="outlined" onClick={() => addTag(s)}
+            <Chip key={s} label={s} size="small" variant="outlined" onClick={() => submit(s)}
               sx={{ fontSize: '0.6875rem', height: 22, cursor: 'pointer', borderColor: '#D1D5DB', color: '#6B7280',
                     '&:hover': { bgcolor: '#D1FAE5', borderColor: '#10B981', color: '#10B981' } }} />
           ))}
@@ -290,7 +329,7 @@ const EditProfile: React.FC = () => {
   const [name, setName]           = useState('');
   const [bio, setBio]             = useState('');
   const [skills, setSkills]       = useState<SkillEntry[]>([]);
-  const [interests, setInterests] = useState<string[]>([]);
+  const [interests, setInterests] = useState<InterestEntry[]>([]);
 
   const [location, setLocation] = useState({
     address: '', neighbourhood: '', city: '', postcode: '', country: '',
@@ -318,7 +357,13 @@ const EditProfile: React.FC = () => {
         ? { name: s as string, proficiency: 'Intermediate', availability: 'Flexible' }
         : s as SkillEntry
     ));
-    setInterests(user.interests ?? []);
+    // Handle legacy string[] interests or new object[] interests
+    const rawInterests = (user.interests ?? []) as unknown[];
+    setInterests(rawInterests.map((i) =>
+      typeof i === 'string'
+        ? { name: i as string, description: '', level: 'Beginner', willingToPay: '' }
+        : i as InterestEntry
+    ));
     setLocation({
       address:       user.location?.address       ?? '',
       neighbourhood: user.location?.neighbourhood ?? '',
@@ -580,7 +625,20 @@ const EditProfile: React.FC = () => {
             3 — Skills I Want to Learn
         ═══════════════════════════════════════════════════════════════ */}
         <SectionCard icon="fa-graduation-cap" title="Skills I'm Looking to Learn" subtitle="What would you love to learn from your neighbours?">
-          <InterestInput tags={interests} onChange={setInterests} />
+          {interests.map((entry, idx) => (
+            <InterestCard
+              key={idx}
+              entry={entry}
+              onChange={(updated) => setInterests((prev) => prev.map((e, i) => i === idx ? updated : e))}
+              onRemove={() => setInterests((prev) => prev.filter((_, i) => i !== idx))}
+            />
+          ))}
+
+          <AddInterestInput
+            existing={interests.map((e) => e.name.toLowerCase())}
+            onAdd={(name) => setInterests((prev) => [...prev, { name, description: '', level: 'Beginner', willingToPay: '' }])}
+          />
+
           {interests.length === 0 && (
             <Box sx={{ mt: '1rem', p: '0.875rem', background: '#F9FAFB', borderRadius: '0.5rem', border: '1px dashed #E5E7EB', textAlign: 'center' }}>
               <i className="fas fa-search" style={{ color: '#D1D5DB', fontSize: '1.25rem', display: 'block', marginBottom: '0.375rem' }} />
