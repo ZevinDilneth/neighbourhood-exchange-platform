@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build outputs
+dist/
+build/
+client/dist/
+server/dist/
+
+# Environment — NEVER commit real secrets
+.env
+.env.local
+.env.production
+**/.env
+**/.env.local
+
+# Logs
+*.log
+*_output.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea/
+
+# Coverage
+coverage/
+.nyc_output/
