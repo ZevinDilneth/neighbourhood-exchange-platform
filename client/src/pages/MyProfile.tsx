@@ -19,6 +19,24 @@ import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { User, Post, Exchange } from '../types';
 
+// ─── Category → icon map for interest cards ───────────────────────────────────
+const CATEGORY_ICONS: Record<string, string> = {
+  Music:       'fa-music',
+  Gardening:   'fa-seedling',
+  Cooking:     'fa-utensils',
+  Art:         'fa-paint-brush',
+  Technology:  'fa-laptop-code',
+  Fitness:     'fa-dumbbell',
+  Languages:   'fa-language',
+  Photography: 'fa-camera',
+  Crafts:      'fa-cut',
+  Sports:      'fa-running',
+  Finance:     'fa-coins',
+  Wellness:    'fa-spa',
+  Education:   'fa-graduation-cap',
+  Other:       'fa-star',
+};
+
 // ─── Gradient pool for tool cards ─────────────────────────────────────────────
 const TOOL_GRADIENTS = [
   'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -848,38 +866,42 @@ const MyProfile: React.FC = () => {
           </Typography>
         ) : (
           <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
-            {profile.interests.map((interest, idx) => (
-              <Box key={idx} sx={{ background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '0.5rem', p: '1.25rem', transition: 'all 0.2s', '&:hover': { borderColor: '#4F46E5', transform: 'translateY(-2px)', boxShadow: '0 1px 3px rgba(0,0,0,0.12)' } }}>
-                {/* Header */}
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: '1rem' }}>
-                  <Typography sx={{ fontSize: '1rem', fontWeight: 600, color: '#1F2937' }}>{interest.name}</Typography>
-                  <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', px: '0.5rem', py: '0.25rem', background: 'linear-gradient(135deg, #4F46E5, #10B981)', color: '#fff', fontSize: '0.75rem', fontWeight: 500, borderRadius: '0.375rem', flexShrink: 0, ml: '0.5rem' }}>
-                    <i className="fas fa-lightbulb" style={{ fontSize: '0.65rem' }} /> Wanted
+            {profile.interests.map((interest, idx) => {
+              const catIcon = CATEGORY_ICONS[interest.category] || 'fa-star';
+              const catLabel = interest.category || 'Other';
+              return (
+                <Box key={idx} sx={{ background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '0.5rem', p: '1.25rem', transition: 'all 0.2s', '&:hover': { borderColor: '#4F46E5', transform: 'translateY(-2px)', boxShadow: '0 1px 3px rgba(0,0,0,0.12)' } }}>
+                  {/* Header: title + category pill */}
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: '0.75rem' }}>
+                    <Typography sx={{ fontSize: '1rem', fontWeight: 700, color: '#1F2937' }}>{interest.name}</Typography>
+                    <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', px: '0.6rem', py: '0.3rem', background: 'linear-gradient(135deg, #4F46E5, #10B981)', color: '#fff', fontSize: '0.75rem', fontWeight: 500, borderRadius: '999px', flexShrink: 0, ml: '0.5rem', whiteSpace: 'nowrap' }}>
+                      <i className={`fas ${catIcon}`} style={{ fontSize: '0.65rem' }} /> {catLabel}
+                    </Box>
+                  </Box>
+                  {/* Description */}
+                  {interest.description && (
+                    <Typography sx={{ mb: '0.75rem', fontSize: '0.875rem', color: '#6B7280', lineHeight: 1.5 }}>
+                      {interest.description}
+                    </Typography>
+                  )}
+                  {/* Details */}
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                    {interest.willingToPay && (
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
+                        <Typography component="span" sx={{ color: '#6B7280', fontSize: '0.875rem' }}>Willing to pay:</Typography>
+                        <Typography component="span" sx={{ color: '#4F46E5', fontWeight: 600, fontSize: '0.875rem' }}>{interest.willingToPay}</Typography>
+                      </Box>
+                    )}
+                    {interest.level && (
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
+                        <Typography component="span" sx={{ color: '#6B7280', fontSize: '0.875rem' }}>Level:</Typography>
+                        <Typography component="span" sx={{ color: '#1F2937', fontWeight: 700, fontSize: '0.875rem' }}>{interest.level}</Typography>
+                      </Box>
+                    )}
                   </Box>
                 </Box>
-                {/* Description */}
-                {interest.description && (
-                  <Typography sx={{ mb: '0.75rem', fontSize: '0.875rem', color: '#6B7280', lineHeight: 1.5 }}>
-                    {interest.description}
-                  </Typography>
-                )}
-                {/* Details */}
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  {interest.willingToPay && (
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
-                      <Typography component="span" sx={{ color: '#6B7280', fontSize: '0.875rem' }}>Willing to pay:</Typography>
-                      <Typography component="span" sx={{ color: '#4F46E5', fontWeight: 600, fontSize: '0.875rem' }}>{interest.willingToPay}</Typography>
-                    </Box>
-                  )}
-                  {interest.level && (
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
-                      <Typography component="span" sx={{ color: '#6B7280', fontSize: '0.875rem' }}>Level:</Typography>
-                      <Typography component="span" sx={{ color: '#1F2937', fontWeight: 500, fontSize: '0.875rem' }}>{interest.level}</Typography>
-                    </Box>
-                  )}
-                </Box>
-              </Box>
-            ))}
+              );
+            })}
           </Box>
         )}
       </Section>

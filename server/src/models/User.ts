@@ -27,10 +27,12 @@ const userSchema = new Schema<IUser>(
     }],
     interests: [{
       name:         { type: String, trim: true, required: true },
+      category:     { type: String, trim: true, default: 'Other' },
       description:  { type: String, trim: true, default: '' },
       level:        { type: String, enum: ['Beginner', 'Intermediate', 'Advanced'], default: 'Beginner' },
       willingToPay: { type: String, trim: true, default: '' },
     }],
+    ceuBalance:    { type: Number, default: 100 },
     rating: { type: Number, default: 0, min: 0, max: 5 },
     reviewCount: { type: Number, default: 0 },
     exchangeCount: { type: Number, default: 0 },

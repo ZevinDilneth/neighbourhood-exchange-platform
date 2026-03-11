@@ -15,7 +15,8 @@ export interface User {
     country?: string;
   };
   skills: { name: string; proficiency: string; availability: string; rate: string }[];
-  interests: { name: string; description: string; level: string; willingToPay: string }[];
+  interests: { name: string; category: string; description: string; level: string; willingToPay: string }[];
+  ceuBalance: number;
   rating: number;
   reviewCount: number;
   exchangeCount: number;

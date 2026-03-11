@@ -32,6 +32,7 @@ interface SkillEntry {
 
 interface InterestEntry {
   name: string;
+  category: string;
   description: string;
   level: string;
   willingToPay: string;
@@ -41,6 +42,17 @@ interface InterestEntry {
 const PROFICIENCY_LEVELS = ['Beginner', 'Intermediate', 'Advanced', 'Expert'];
 const AVAILABILITY_OPTIONS = ['Flexible', 'Weekdays', 'Weekends', 'Evenings', 'Mornings', 'Anytime', 'By Appointment'];
 const INTEREST_LEVELS = ['Beginner', 'Intermediate', 'Advanced'];
+const INTEREST_CATEGORIES = [
+  'Music', 'Gardening', 'Cooking', 'Art', 'Technology', 'Fitness',
+  'Languages', 'Photography', 'Crafts', 'Sports', 'Finance', 'Wellness', 'Education', 'Other',
+];
+const CATEGORY_ICONS: Record<string, string> = {
+  Music: 'fa-music', Gardening: 'fa-seedling', Cooking: 'fa-utensils',
+  Art: 'fa-paint-brush', Technology: 'fa-laptop-code', Fitness: 'fa-dumbbell',
+  Languages: 'fa-language', Photography: 'fa-camera', Crafts: 'fa-cut',
+  Sports: 'fa-running', Finance: 'fa-coins', Wellness: 'fa-spa',
+  Education: 'fa-graduation-cap', Other: 'fa-star',
+};
 
 const SKILL_SUGGESTIONS = [
   'Cooking', 'Gardening', 'Photography', 'Coding', 'Music', 'Yoga',
@@ -233,21 +245,37 @@ const InterestCard: React.FC<{
       <i className="fas fa-times" style={{ fontSize: '0.75rem' }} />
     </IconButton>
 
-    {/* Name + badge */}
+    {/* Name + category pill */}
     <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem', mb: '0.875rem', pr: '1.75rem' }}>
       <Typography sx={{ fontWeight: 600, fontSize: '0.9375rem', color: '#1F2937', flex: 1 }}>{entry.name}</Typography>
-      <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', px: '0.5rem', py: '0.2rem', background: GRAD, color: '#fff', fontSize: '0.6875rem', fontWeight: 500, borderRadius: '0.375rem', flexShrink: 0 }}>
-        <i className="fas fa-lightbulb" style={{ fontSize: '0.6rem' }} /> Wanted
+      <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', px: '0.6rem', py: '0.25rem', background: GRAD, color: '#fff', fontSize: '0.75rem', fontWeight: 500, borderRadius: '999px', flexShrink: 0, whiteSpace: 'nowrap' }}>
+        <i className={`fas ${CATEGORY_ICONS[entry.category] || 'fa-star'}`} style={{ fontSize: '0.65rem' }} /> {entry.category || 'Other'}
       </Box>
     </Box>
 
-    {/* Description */}
-    <TextField fullWidth size="small" label="What do you want to learn?" placeholder="e.g. Basic chords and strumming patterns"
-      value={entry.description}
-      onChange={(e) => onChange({ ...entry, description: e.target.value })}
-      sx={{ mb: '0.625rem', '& .MuiOutlinedInput-root': { borderRadius: '0.5rem', fontSize: '0.8125rem' } }}
-      InputLabelProps={{ sx: { fontSize: '0.8125rem' } }}
-    />
+    {/* Category + Description row */}
+    <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '0.625rem', mb: '0.625rem' }}>
+      <FormControl size="small" fullWidth>
+        <InputLabel sx={{ fontSize: '0.8125rem' }}>Category</InputLabel>
+        <Select label="Category" value={entry.category || 'Other'}
+          onChange={(e) => onChange({ ...entry, category: e.target.value })}
+          sx={{ borderRadius: '0.5rem', fontSize: '0.8125rem' }}>
+          {INTEREST_CATEGORIES.map((c) => (
+            <MenuItem key={c} value={c} sx={{ fontSize: '0.8125rem' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <i className={`fas ${CATEGORY_ICONS[c]}`} style={{ width: 14, color: '#6B7280' }} /> {c}
+              </Box>
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <TextField fullWidth size="small" label="What do you want to learn?" placeholder="e.g. Basic chords and strumming"
+        value={entry.description}
+        onChange={(e) => onChange({ ...entry, description: e.target.value })}
+        sx={{ '& .MuiOutlinedInput-root': { borderRadius: '0.5rem', fontSize: '0.8125rem' } }}
+        InputLabelProps={{ sx: { fontSize: '0.8125rem' } }}
+      />
+    </Box>
 
     {/* Level + Willing to pay */}
     <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.625rem' }}>
@@ -375,8 +403,8 @@ const EditProfile: React.FC = () => {
     const rawInterests = (user.interests ?? []) as unknown[];
     setInterests(rawInterests.map((i) =>
       typeof i === 'string'
-        ? { name: i as string, description: '', level: 'Beginner', willingToPay: '' }
-        : i as InterestEntry
+        ? { name: i as string, category: 'Other', description: '', level: 'Beginner', willingToPay: '' }
+        : (i as InterestEntry).category ? (i as InterestEntry) : { ...(i as InterestEntry), category: 'Other' }
     ));
     setLocation({
       address:       user.location?.address       ?? '',
@@ -650,7 +678,7 @@ const EditProfile: React.FC = () => {
 
           <AddInterestInput
             existing={interests.map((e) => e.name.toLowerCase())}
-            onAdd={(name) => setInterests((prev) => [...prev, { name, description: '', level: 'Beginner', willingToPay: '' }])}
+            onAdd={(name) => setInterests((prev) => [...prev, { name, category: 'Other', description: '', level: 'Beginner', willingToPay: '' }])}
           />
 
           {interests.length === 0 && (
