@@ -806,35 +806,35 @@ const MyProfile: React.FC = () => {
               const skillTypeIcon: Record<string, string> = { Teaching: 'fa-chalkboard-teacher', Exchange: 'fa-exchange-alt', Both: 'fa-hands-helping', Other: 'fa-star' };
               const icon = skillTypeIcon[skill.type] || 'fa-chalkboard-teacher';
               return (
-                <Box key={skill.name} sx={{ background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '0.5rem', p: '1.25rem', transition: 'all 0.2s', '&:hover': { borderColor: '#4F46E5', transform: 'translateY(-2px)', boxShadow: '0 1px 3px rgba(0,0,0,0.12)' } }}>
+                <Box key={skill.name} sx={{ background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: '0.5rem', p: '1.25rem', transition: 'all 0.2s', '&:hover': { borderColor: '#4F46E5', transform: 'translateY(-2px)', boxShadow: '0 1px 3px rgba(0,0,0,0.12)' } }}>
                   {/* Header */}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: '0.75rem' }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: '1rem' }}>
                     <Typography sx={{ fontSize: '1rem', fontWeight: 600, color: '#1F2937' }}>{skill.name}</Typography>
-                    <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', px: '0.6rem', py: '0.3rem', background: 'linear-gradient(135deg, #4F46E5, #10B981)', color: '#fff', fontSize: '0.75rem', fontWeight: 500, borderRadius: '999px', flexShrink: 0, ml: '0.5rem', whiteSpace: 'nowrap' }}>
-                      <i className={`fas ${icon}`} style={{ fontSize: '0.65rem' }} /> {skill.type || 'Teaching'}
+                    <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', px: '0.5rem', py: '0.25rem', background: 'linear-gradient(135deg, #4F46E5, #10B981)', color: '#fff', fontSize: '0.75rem', fontWeight: 500, borderRadius: '0.375rem', flexShrink: 0, ml: '0.5rem', whiteSpace: 'nowrap' }}>
+                      <i className={`fas ${icon}`} style={{ fontSize: '0.7rem' }} /> {skill.type || 'Teaching'}
                     </Box>
                   </Box>
                   {/* Description */}
                   {skill.description && (
-                    <Typography sx={{ mb: '0.75rem', fontSize: '0.875rem', color: '#6B7280', lineHeight: 1.5 }}>
+                    <Typography sx={{ fontSize: '0.875rem', color: '#6B7280' }}>
                       {skill.description}
                     </Typography>
                   )}
                   {/* Details */}
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', mt: '1rem' }}>
                     {skill.rate && (
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
                         <Typography component="span" sx={{ color: '#6B7280', fontSize: '0.875rem' }}>CEU Rate:</Typography>
-                        <Typography component="span" sx={{ color: '#4F46E5', fontWeight: 700, fontSize: '0.875rem' }}>{skill.rate}</Typography>
+                        <Typography component="span" sx={{ color: '#4F46E5', fontWeight: 600, fontSize: '0.875rem' }}>{skill.rate}</Typography>
                       </Box>
                     )}
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
                       <Typography component="span" sx={{ color: '#6B7280', fontSize: '0.875rem' }}>Proficiency:</Typography>
-                      <Typography component="span" sx={{ color: '#1F2937', fontWeight: 600, fontSize: '0.875rem' }}>{skill.proficiency || 'Intermediate'}</Typography>
+                      <Typography component="span" sx={{ color: '#1F2937', fontWeight: 500, fontSize: '0.875rem' }}>{skill.proficiency || 'Intermediate'}</Typography>
                     </Box>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
                       <Typography component="span" sx={{ color: '#6B7280', fontSize: '0.875rem' }}>Availability:</Typography>
-                      <Typography component="span" sx={{ color: '#1F2937', fontWeight: 600, fontSize: '0.875rem' }}>{skill.availability || 'Flexible'}</Typography>
+                      <Typography component="span" sx={{ color: '#1F2937', fontWeight: 500, fontSize: '0.875rem' }}>{skill.availability || 'Flexible'}</Typography>
                     </Box>
                   </Box>
                 </Box>
@@ -863,32 +863,32 @@ const MyProfile: React.FC = () => {
               const icon = catIcon[interest.category] || 'fa-lightbulb';
               const label = interest.category || 'Other';
               return (
-                <Box key={idx} sx={{ background: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '0.5rem', p: '1.25rem', transition: 'all 0.2s', '&:hover': { borderColor: '#4F46E5', transform: 'translateY(-2px)', boxShadow: '0 1px 3px rgba(0,0,0,0.12)' } }}>
+                <Box key={idx} sx={{ background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: '0.5rem', p: '1.25rem', transition: 'all 0.2s', '&:hover': { borderColor: '#4F46E5', transform: 'translateY(-2px)', boxShadow: '0 1px 3px rgba(0,0,0,0.12)' } }}>
                   {/* Header */}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: '0.75rem' }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: '1rem' }}>
                     <Typography sx={{ fontSize: '1rem', fontWeight: 600, color: '#1F2937' }}>{interest.name}</Typography>
-                    <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', px: '0.6rem', py: '0.3rem', background: 'linear-gradient(135deg, #4F46E5, #10B981)', color: '#fff', fontSize: '0.75rem', fontWeight: 500, borderRadius: '999px', flexShrink: 0, ml: '0.5rem', whiteSpace: 'nowrap' }}>
-                      <i className={`fas ${icon}`} style={{ fontSize: '0.65rem' }} /> {label}
+                    <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', px: '0.5rem', py: '0.25rem', background: 'linear-gradient(135deg, #4F46E5, #10B981)', color: '#fff', fontSize: '0.75rem', fontWeight: 500, borderRadius: '0.375rem', flexShrink: 0, ml: '0.5rem', whiteSpace: 'nowrap' }}>
+                      <i className={`fas ${icon}`} style={{ fontSize: '0.7rem' }} /> {label}
                     </Box>
                   </Box>
                   {/* Description */}
                   {interest.description && (
-                    <Typography sx={{ mb: '0.75rem', fontSize: '0.875rem', color: '#6B7280', lineHeight: 1.5 }}>
+                    <Typography sx={{ fontSize: '0.875rem', color: '#6B7280' }}>
                       {interest.description}
                     </Typography>
                   )}
                   {/* Details */}
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', mt: '1rem' }}>
                     {interest.willingToPay && (
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
                         <Typography component="span" sx={{ color: '#6B7280', fontSize: '0.875rem' }}>Willing to pay:</Typography>
-                        <Typography component="span" sx={{ color: '#4F46E5', fontWeight: 700, fontSize: '0.875rem' }}>{interest.willingToPay}</Typography>
+                        <Typography component="span" sx={{ color: '#4F46E5', fontWeight: 600, fontSize: '0.875rem' }}>{interest.willingToPay}</Typography>
                       </Box>
                     )}
                     {interest.level && (
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
                         <Typography component="span" sx={{ color: '#6B7280', fontSize: '0.875rem' }}>Level:</Typography>
-                        <Typography component="span" sx={{ color: '#1F2937', fontWeight: 600, fontSize: '0.875rem' }}>{interest.level}</Typography>
+                        <Typography component="span" sx={{ color: '#1F2937', fontWeight: 500, fontSize: '0.875rem' }}>{interest.level}</Typography>
                       </Box>
                     )}
                   </Box>
