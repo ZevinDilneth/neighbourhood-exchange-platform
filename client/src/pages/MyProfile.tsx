@@ -8,8 +8,14 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  DialogActions,
   IconButton,
   CircularProgress,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -51,6 +57,207 @@ const Section: React.FC<{ icon: string; title: string; action?: React.ReactNode;
     {children}
   </Box>
 );
+
+// ─── Inline edit modals ────────────────────────────────────────────────────────
+
+const PROFICIENCY_LEVELS = ['Beginner', 'Intermediate', 'Advanced', 'Expert'];
+const AVAILABILITY_OPTIONS = ['Flexible', 'Weekdays', 'Weekends', 'Evenings', 'Mornings', 'Anytime', 'By Appointment'];
+const SKILL_TYPES = ['Teaching', 'Exchange', 'Both', 'Other'];
+const INTEREST_LEVELS = ['Beginner', 'Intermediate', 'Advanced'];
+const INTEREST_CATEGORIES = ['Music', 'Gardening', 'Cooking', 'Art', 'Technology', 'Fitness', 'Languages', 'Photography', 'Crafts', 'Sports', 'Other'];
+
+type SkillEntry = { name: string; type: string; description: string; proficiency: string; availability: string; rate: string };
+type InterestEntry = { name: string; category: string; description: string; level: string; willingToPay: string };
+
+const inputSx = { '& .MuiOutlinedInput-root': { borderRadius: '0.5rem', fontSize: '0.8125rem' } };
+
+const SkillsEditModal: React.FC<{
+  open: boolean;
+  initialSkills: SkillEntry[];
+  onClose: () => void;
+  onSave: (skills: SkillEntry[]) => Promise<void>;
+}> = ({ open, initialSkills, onClose, onSave }) => {
+  const [skills, setSkills] = useState<SkillEntry[]>(initialSkills);
+  const [newName, setNewName] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => { if (open) setSkills(initialSkills); }, [open]);
+
+  const addSkill = () => {
+    const n = newName.trim();
+    if (!n || skills.some(s => s.name.toLowerCase() === n.toLowerCase())) return;
+    setSkills(prev => [...prev, { name: n, type: 'Teaching', description: '', proficiency: 'Intermediate', availability: 'Flexible', rate: '' }]);
+    setNewName('');
+  };
+
+  const update = (i: number, patch: Partial<SkillEntry>) =>
+    setSkills(prev => prev.map((s, idx) => idx === i ? { ...s, ...patch } : s));
+
+  const remove = (i: number) => setSkills(prev => prev.filter((_, idx) => idx !== i));
+
+  const handleSave = async () => {
+    setSaving(true);
+    try { await onSave(skills); onClose(); } finally { setSaving(false); }
+  };
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: '0.75rem' } }}>
+      <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 1, fontFamily: 'Poppins, sans-serif', fontWeight: 700 }}>
+        Edit Skills Offered
+        <IconButton size="small" onClick={onClose}><i className="fas fa-times" /></IconButton>
+      </DialogTitle>
+      <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: '1rem', pt: '1rem' }}>
+        {/* Add new skill */}
+        <Box sx={{ display: 'flex', gap: '0.5rem' }}>
+          <TextField size="small" fullWidth placeholder="Add a skill…" value={newName}
+            onChange={e => setNewName(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addSkill(); } }}
+            sx={inputSx} />
+          <Button variant="contained" onClick={addSkill}
+            sx={{ background: 'linear-gradient(135deg,#4F46E5,#10B981)', color: '#fff', borderRadius: '0.5rem', textTransform: 'none', flexShrink: 0 }}>
+            Add
+          </Button>
+        </Box>
+
+        {/* Skill cards */}
+        {skills.map((skill, i) => (
+          <Box key={i} sx={{ background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: '0.5rem', p: '1rem', position: 'relative' }}>
+            <IconButton size="small" onClick={() => remove(i)}
+              sx={{ position: 'absolute', top: 8, right: 8, color: '#9CA3AF', '&:hover': { color: '#EF4444', background: '#FEF2F2' } }}>
+              <i className="fas fa-times" style={{ fontSize: '0.75rem' }} />
+            </IconButton>
+            <Typography sx={{ fontWeight: 600, fontSize: '0.9375rem', color: '#1F2937', mb: '0.75rem', pr: '2rem' }}>{skill.name}</Typography>
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.625rem', mb: '0.625rem' }}>
+              <FormControl size="small" fullWidth>
+                <InputLabel>Type</InputLabel>
+                <Select label="Type" value={skill.type || 'Teaching'} onChange={e => update(i, { type: e.target.value })} sx={{ borderRadius: '0.5rem', fontSize: '0.8125rem' }}>
+                  {SKILL_TYPES.map(t => <MenuItem key={t} value={t} sx={{ fontSize: '0.8125rem' }}>{t}</MenuItem>)}
+                </Select>
+              </FormControl>
+              <TextField size="small" fullWidth label="CEU Rate" placeholder="e.g. 25/hr"
+                value={skill.rate} onChange={e => update(i, { rate: e.target.value })} sx={inputSx} />
+            </Box>
+            <TextField size="small" fullWidth label="Description" placeholder="What will you teach?"
+              value={skill.description} onChange={e => update(i, { description: e.target.value })} sx={{ ...inputSx, mb: '0.625rem' }} />
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.625rem' }}>
+              <FormControl size="small" fullWidth>
+                <InputLabel>Proficiency</InputLabel>
+                <Select label="Proficiency" value={skill.proficiency || 'Intermediate'} onChange={e => update(i, { proficiency: e.target.value })} sx={{ borderRadius: '0.5rem', fontSize: '0.8125rem' }}>
+                  {PROFICIENCY_LEVELS.map(l => <MenuItem key={l} value={l} sx={{ fontSize: '0.8125rem' }}>{l}</MenuItem>)}
+                </Select>
+              </FormControl>
+              <FormControl size="small" fullWidth>
+                <InputLabel>Availability</InputLabel>
+                <Select label="Availability" value={skill.availability || 'Flexible'} onChange={e => update(i, { availability: e.target.value })} sx={{ borderRadius: '0.5rem', fontSize: '0.8125rem' }}>
+                  {AVAILABILITY_OPTIONS.map(a => <MenuItem key={a} value={a} sx={{ fontSize: '0.8125rem' }}>{a}</MenuItem>)}
+                </Select>
+              </FormControl>
+            </Box>
+          </Box>
+        ))}
+        {skills.length === 0 && (
+          <Typography sx={{ color: '#9CA3AF', fontStyle: 'italic', textAlign: 'center', py: '1rem' }}>No skills yet. Add one above.</Typography>
+        )}
+      </DialogContent>
+      <DialogActions sx={{ px: '1.5rem', py: '1rem' }}>
+        <Button onClick={onClose} sx={{ color: '#6B7280', textTransform: 'none' }}>Cancel</Button>
+        <Button onClick={handleSave} disabled={saving} variant="contained"
+          sx={{ background: 'linear-gradient(135deg,#4F46E5,#10B981)', color: '#fff', borderRadius: '0.5rem', textTransform: 'none', fontWeight: 600 }}>
+          {saving ? <CircularProgress size={16} color="inherit" /> : 'Save'}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
+
+const InterestsEditModal: React.FC<{
+  open: boolean;
+  initialInterests: InterestEntry[];
+  onClose: () => void;
+  onSave: (interests: InterestEntry[]) => Promise<void>;
+}> = ({ open, initialInterests, onClose, onSave }) => {
+  const [interests, setInterests] = useState<InterestEntry[]>(initialInterests);
+  const [newName, setNewName] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => { if (open) setInterests(initialInterests); }, [open]);
+
+  const addInterest = () => {
+    const n = newName.trim();
+    if (!n || interests.some(i => i.name.toLowerCase() === n.toLowerCase())) return;
+    setInterests(prev => [...prev, { name: n, category: 'Other', description: '', level: 'Beginner', willingToPay: '' }]);
+    setNewName('');
+  };
+
+  const update = (i: number, patch: Partial<InterestEntry>) =>
+    setInterests(prev => prev.map((s, idx) => idx === i ? { ...s, ...patch } : s));
+
+  const remove = (i: number) => setInterests(prev => prev.filter((_, idx) => idx !== i));
+
+  const handleSave = async () => {
+    setSaving(true);
+    try { await onSave(interests); onClose(); } finally { setSaving(false); }
+  };
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: '0.75rem' } }}>
+      <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', pb: 1, fontFamily: 'Poppins, sans-serif', fontWeight: 700 }}>
+        Edit Skills I Want to Learn
+        <IconButton size="small" onClick={onClose}><i className="fas fa-times" /></IconButton>
+      </DialogTitle>
+      <DialogContent dividers sx={{ display: 'flex', flexDirection: 'column', gap: '1rem', pt: '1rem' }}>
+        <Box sx={{ display: 'flex', gap: '0.5rem' }}>
+          <TextField size="small" fullWidth placeholder="Add a skill you want to learn…" value={newName}
+            onChange={e => setNewName(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addInterest(); } }}
+            sx={inputSx} />
+          <Button variant="contained" onClick={addInterest}
+            sx={{ background: 'linear-gradient(135deg,#4F46E5,#10B981)', color: '#fff', borderRadius: '0.5rem', textTransform: 'none', flexShrink: 0 }}>
+            Add
+          </Button>
+        </Box>
+
+        {interests.map((entry, i) => (
+          <Box key={i} sx={{ background: '#F9FAFB', border: '1px solid #E5E7EB', borderRadius: '0.5rem', p: '1rem', position: 'relative' }}>
+            <IconButton size="small" onClick={() => remove(i)}
+              sx={{ position: 'absolute', top: 8, right: 8, color: '#9CA3AF', '&:hover': { color: '#EF4444', background: '#FEF2F2' } }}>
+              <i className="fas fa-times" style={{ fontSize: '0.75rem' }} />
+            </IconButton>
+            <Typography sx={{ fontWeight: 600, fontSize: '0.9375rem', color: '#1F2937', mb: '0.75rem', pr: '2rem' }}>{entry.name}</Typography>
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.625rem', mb: '0.625rem' }}>
+              <FormControl size="small" fullWidth>
+                <InputLabel>Category</InputLabel>
+                <Select label="Category" value={entry.category || 'Other'} onChange={e => update(i, { category: e.target.value })} sx={{ borderRadius: '0.5rem', fontSize: '0.8125rem' }}>
+                  {INTEREST_CATEGORIES.map(c => <MenuItem key={c} value={c} sx={{ fontSize: '0.8125rem' }}>{c}</MenuItem>)}
+                </Select>
+              </FormControl>
+              <TextField size="small" fullWidth label="Willing to pay" placeholder="e.g. 20/hr"
+                value={entry.willingToPay} onChange={e => update(i, { willingToPay: e.target.value })} sx={inputSx} />
+            </Box>
+            <TextField size="small" fullWidth label="What do you want to learn?" placeholder="e.g. Basic chords…"
+              value={entry.description} onChange={e => update(i, { description: e.target.value })} sx={{ ...inputSx, mb: '0.625rem' }} />
+            <FormControl size="small" fullWidth>
+              <InputLabel>Your Level</InputLabel>
+              <Select label="Your Level" value={entry.level || 'Beginner'} onChange={e => update(i, { level: e.target.value })} sx={{ borderRadius: '0.5rem', fontSize: '0.8125rem' }}>
+                {INTEREST_LEVELS.map(l => <MenuItem key={l} value={l} sx={{ fontSize: '0.8125rem' }}>{l}</MenuItem>)}
+              </Select>
+            </FormControl>
+          </Box>
+        ))}
+        {interests.length === 0 && (
+          <Typography sx={{ color: '#9CA3AF', fontStyle: 'italic', textAlign: 'center', py: '1rem' }}>Nothing yet. Add a skill above.</Typography>
+        )}
+      </DialogContent>
+      <DialogActions sx={{ px: '1.5rem', py: '1rem' }}>
+        <Button onClick={onClose} sx={{ color: '#6B7280', textTransform: 'none' }}>Cancel</Button>
+        <Button onClick={handleSave} disabled={saving} variant="contained"
+          sx={{ background: 'linear-gradient(135deg,#4F46E5,#10B981)', color: '#fff', borderRadius: '0.5rem', textTransform: 'none', fontWeight: 600 }}>
+          {saving ? <CircularProgress size={16} color="inherit" /> : 'Save'}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
 
 const SectionIconBtn: React.FC<{ icon: string; onClick?: () => void }> = ({ icon, onClick }) => (
   <Box component="button" onClick={onClick} sx={{ background: 'none', border: 'none', color: '#6B7280', cursor: 'pointer', p: '0.5rem', borderRadius: '0.375rem', fontSize: '0.875rem', transition: 'all 0.2s', '&:hover': { color: '#4F46E5', background: '#F3F4F6' } }}>
@@ -441,6 +648,13 @@ const MyProfile: React.FC = () => {
 
   const [videoModalOpen, setVideoModalOpen] = useState(false);
   const [savedVideoUrl, setSavedVideoUrl]   = useState<string | null>(null);
+  const [skillsModalOpen, setSkillsModalOpen]       = useState(false);
+  const [interestsModalOpen, setInterestsModalOpen] = useState(false);
+
+  const saveSection = async (patch: Record<string, unknown>) => {
+    await api.put('/users/me', patch);
+    queryClient.invalidateQueries({ queryKey: ['profile', profileId] });
+  };
 
   const profileId = (!id || id === 'me') ? currentUser?._id : id;
   const isOwnProfile = !id || id === 'me' || id === currentUser?._id;
@@ -791,8 +1005,8 @@ const MyProfile: React.FC = () => {
         title="Skills Offered"
         action={isOwnProfile ? (
           <>
-            <SectionIconBtn icon="fa-plus" onClick={() => navigate('/create?type=skill')} />
-            <SectionIconBtn icon="fa-edit" onClick={() => navigate('/profile/edit')} />
+            <SectionIconBtn icon="fa-plus" onClick={() => setSkillsModalOpen(true)} />
+            <SectionIconBtn icon="fa-edit" onClick={() => setSkillsModalOpen(true)} />
           </>
         ) : undefined}
       >
@@ -850,7 +1064,12 @@ const MyProfile: React.FC = () => {
       <Section
         icon="fa-lightbulb"
         title="Skills I Want to Learn"
-        action={isOwnProfile ? <SectionIconBtn icon="fa-edit" onClick={() => navigate('/profile/edit')} /> : undefined}
+        action={isOwnProfile ? (
+          <>
+            <SectionIconBtn icon="fa-plus" onClick={() => setInterestsModalOpen(true)} />
+            <SectionIconBtn icon="fa-edit" onClick={() => setInterestsModalOpen(true)} />
+          </>
+        ) : undefined}
       >
         {profile.interests.length === 0 ? (
           <Typography sx={{ color: '#9CA3AF', fontStyle: 'italic', fontSize: '0.9375rem' }}>
@@ -1167,6 +1386,22 @@ const MyProfile: React.FC = () => {
         }}
       />
     )}
+
+    {/* Skills Offered edit modal */}
+    <SkillsEditModal
+      open={skillsModalOpen}
+      initialSkills={(profile?.skills ?? []) as SkillEntry[]}
+      onClose={() => setSkillsModalOpen(false)}
+      onSave={(skills) => saveSection({ skills })}
+    />
+
+    {/* Skills I Want to Learn edit modal */}
+    <InterestsEditModal
+      open={interestsModalOpen}
+      initialInterests={(profile?.interests ?? []) as InterestEntry[]}
+      onClose={() => setInterestsModalOpen(false)}
+      onSave={(interests) => saveSection({ interests })}
+    />
     </>
   );
 };
